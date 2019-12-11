@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>關於定時器</title>
+    <!-- 封裝好的JS文件必須在最一開始引入 才能在下面代碼中進行使用 -->
+    <script type="text/javascript" src="./fn.js">
+    </script>
+    <style>
+        h3 {
+            color: red;
+        }
+
+        #bt1 {
+            color: red;
+        }
+
+        #bt2 {
+            color: teal;
+        }
+
+        #big {
+            width: 20px;
+            height: 20px;
+            background-color: goldenrod;
+            margin-top: 10px;
+        }
+
+        #big:hover {
+            border: 3px solid rgb(87, 74, 2);
+        }
+
+        #box2 {
+            width: 400px;
+            height: 220px;
+            margin: 100px auto;
+            background: url('');
+            background-size: cover;
+            position: relative;
+        }
+
+        .title {
+            width: 100%;
+            height: 30px;
+            line-height: 30px;
+            background-color: teal;
+            color: #fff;
+            text-align: center;
+            position: absolute;
+            top: -30px;
+        }
+
+        #out {
+            position: absolute;
+            top: -50px;
+        }
+
+        #list {
+            width: 100%;
+            height: 25px;
+            text-align: center;
+        }
+
+        #list>span {
+            width: 7px;
+            height: 7px;
+            border: 1px solid black;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 6px;
+        }
+
+        #page {
+            position: absolute;
+            top: -180px;
+            left: 50px;
+            height: 130px;
+            width: 280px;
+            font-size: 42px;
+            text-align: center;
+        }
+
+        #box3 {
+            width: 600px;
+            margin: 100px auto;
+        }
+
+        #timer {
+            height: 120px;
+            border: 2px solid olive;
+            text-align: center;
+            width: 600px;
+            margin: 30px auto;
+            font-size: 60px;
+            line-height: 60px;
+            background-color: rgb(87, 74, 2);
+            padding: 15px;
+        }
+
+        #timer>span {
+            display: inline-block;
+            color: wheat;
+            padding: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h3>類似於 Jquery 的函數封裝</h3>
+    <div id="box">
+        我是一句話。
+    </div>
+    <script>
+        $('box').onclick = function () {
+            console.log(this.innerText)
+        }
+    </script>
+
+    <h3>點擊按鈕獲取樣式的函數封裝</h3>
+    正常在JS裡面 obj.style.color 這種方式只能獲取內聯樣式<br>
+    若要獲取 style 標籤中的樣式 則必須在文檔加載成功後<br>
+    針對 IE 瀏覽器的是 obj.currentStyle.color <br>
+    非 IE 的是 getComputedStyle(obj).color <br><br>
+    <input id="bt1" type="button" value="按鈕1">
+    <input id="bt2" type="button" value="按鈕2">
+    <script>
+        $('bt1').onclick = function () {
+            console.log(getS(this, 'color'))
+        }
+
+        $('bt2').onclick = function () {
+            console.log(getS(this, 'color'))
+        }
+    </script>
+
+    <h3>小案例：點擊 div 使其變大</h3>
+    // 注意 獲取到的值 是帶有單位的 所以要先 parseInt 再增值 再補上單位
+    <div id="big"></div>
+    <script>
+        $('big').onclick = function () {
+            this.style.width = (parseInt(getS(this, 'width')) + 10) + 'px'
+            this.style.height = (parseInt(getS(this, 'height')) + 10) + 'px'
+        }
+    </script>
+
+    <h3>定時器的基本使用</h3>
+    用法是：setInterval(func,time) <br>
+    參數一放的是你每幾毫秒所要執行的事件<br>
+    參數二是間隔時間(單位毫秒 最小值為10)<br>
+    // 注意 要在一開始定義一個 timer 為 setInterval() <br>
+    // 到時候 clearInterval() 才知道要清空什麼 <br><br>
+    <input id="start" type="button" value="start">
+    <input id="stop" type="button" value="stop">
+    <br><br>
+    <u style="color: teal;">Interval是可重複執行的定時器，另有Timeout是只執行一次的，使用方式一樣</u>
+    <script>
+        var timer = '' // 定義一個空對象 到時候存放定時器
+
+        var num = 0
+        var run = function () {
+            num++
+            console.log(num)
+        }
+
+        $('start').onclick = function () {
+            // 當定時器尚未被啟動時執行 
+            if (timer == '') {
+                timer = setInterval(function () {
+                    run()
+                }, 500)
+            } else {
+                // 如果啟動了則不再次執行 不然會變成重複調用
+                console.log('已啟動,禁止重複啟動')
+            }
+        }
+
+        $('stop').onclick = function () {
+            clearInterval(timer)
+            timer = ''
+        }
+    </script>
+
+    <h3>定時器案例：輪播圖A 點擊黑點可切換圖片</h3>
+
+    <div id="box2">
+        <input style="right:0;" id="out" type="button" value="點我停止輪播">
+        <div class="title">
+            Kayle_Splash_1
+        </div>
+        <div id="list" style="position: absolute;bottom:-25px; background-color: teal;">
+            <input id="page" type="text" placeholder="請輸入1~7"><input type="button" onclick="Creat()" value="確認">
+        </div>
+    </div>
+    <script>
+        var oBox = document.getElementById('box2')
+        var oTitle = document.getElementsByClassName('title')
+        var aList = document.getElementById('list')
+        var addPage = document.getElementById('page')
+        var timer2 = ''
+        var stop = function () {
+            clearInterval(timer2)
+            timer2 = ''
+        }
+
+        $('out').onclick = function () {
+            stop()
+        }
+
+        var Creat = function () {
+            var active = function () {
+                for (x = 0; x < page.length; x++) {
+                    page[x].style.background = 'teal'
+                }
+                page[now].style.background = 'black'
+            }
+
+            var myPage = ''
+            var num2 = addPage.value
+            for (h = 1; h <= num2; h++) {
+                myPage += '<span></span>'
+                aList.innerHTML = myPage
+            }
+
+            var page = $('list').getElementsByTagName('span')
+            var now = 0
+
+            oBox.style.backgroundImage =
+                "url('./img/Kayle_Splash_" + now + ".jpg')"
+
+            for (i = 0; i < page.length; i++) {
+                page[i].i = i
+                page[0].style.background = 'black'
+                page[i].onclick = function () {
+                    now = this.i
+                    oBox.style.backgroundImage =
+                        "url('./img/Kayle_Splash_" + this.i +
+                        ".jpg')"
+                    oTitle[0].innerHTML = "Kayle_Splash_" + (this.i + 1)
+                    active()
+                    stop()
+                    go()
+                }
+            }
+
+            var go = function () {
+                if (timer2 == '') {
+                    timer2 = setInterval(function () {
+                        if (now == page.length - 1) {
+                            now = 0
+                            oBox.style.backgroundImage =
+                                "url('./img/Kayle_Splash_" + now +
+                                ".jpg')"
+                            oTitle[0].innerHTML = "Kayle_Splash_" + (now + 1)
+                        } else {
+                            now = now + 1
+                            oBox.style.backgroundImage =
+                                "url('./img/Kayle_Splash_" + now +
+                                ".jpg')"
+                            oTitle[0].innerHTML = "Kayle_Splash_" + (now + 1)
+                        }
+                        active()
+                    }, 900)
+                }
+            }
+
+            go()
+        }
+    </script>
+
+    <h3>定時器案例：輪播圖B 自動輪播</h3>
+    <div id="box3">
+        <img id="img" src="./img/img_01.png" alt="">
+    </div>
+    <script>
+        var i = 1
+        var run2 = function () {
+            i++
+            if (i > 5) {
+                i = 1
+            }
+            $('img').src = './img/img_0' + i +
+                '.png'
+        }
+        setInterval(function () {
+            run2()
+        }, 800)
+    </script>
+
+    <h3>獲取現在時間的方式 Date</h3>
+    new 一個 Date 對象 即可得到目前的秒數<br>
+    有各種方式可獲的年.月.日.星期.時.分.秒<br>
+    // 小重點：獲得的月份是0~11 必須＋1才會是正確月份數
+    <script>
+        var nowTime = new Date()
+        console.log(nowTime) // 國際標準時間
+        console.log(nowTime.getTime()) // 從0/0/0開始到現在的總毫秒數
+        console.log(nowTime.getFullYear()) // 獲取年
+        console.log(nowTime.getMonth() + 1) // 獲取月(記得＋1)
+        console.log(nowTime.getDate()) // 獲取日
+        console.log(nowTime.getDay()) // 獲取星期
+        console.log(nowTime.getHours()) // 獲取小時
+        console.log(nowTime.getMinutes()) // 獲取分鐘數
+        console.log(nowTime.getSeconds()) // 獲取秒數
+    </script>
+
+    <h3>倒數計時器：結合日期類型跟定時器</h3>
+    <div id="timer">
+        <i>距離結束還有：</i><br>
+        <span></span>小時<span></span>分<span></span>秒
+    </div>
+    <script>
+        var aSpan = $('timer').getElementsByTagName('span')
+        setInterval(function () {
+            // 倒計時 = 結束時間- 當前時間
+
+            // 先獲取當前毫秒數
+            var time = new Date()
+            var nowTime = time.getTime()
+
+            // 設置結束時間
+            time.setDate(31)
+            time.setHours(12)
+            time.setMinutes(0)
+            time.setSeconds(0)
+            var endTime = time.getTime()
+
+            // 獲取現在時間到結束時間的距離 轉成秒
+            var offsetTime = (endTime - nowTime) / 1000
+            var S = parseInt(offsetTime % 60)
+            var M = parseInt(offsetTime / 60 % 60)
+            var H = parseInt(offsetTime / 60 / 60)
+
+            if (S < 10) {
+                S = '0' + S
+            }
+            if (M < 10) {
+                M = '0' + M
+            }
+            if (H < 10) {
+                H = '0' + H
+            }
+
+            aSpan[0].innerText = H
+            aSpan[1].innerText = M
+            aSpan[2].innerText = S
+
+        }, 1000)
+    </script>
+</body>
+
+</html>
